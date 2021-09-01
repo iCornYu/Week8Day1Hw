@@ -19,7 +19,7 @@ function Todo({ todo, index, completeTodo, removeTodo }) {
 }
 
 function TodoForm({ addTodo }) {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState();
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -40,48 +40,47 @@ function TodoForm({ addTodo }) {
   );
 }
 
-function App() {
-  const [todos, setTodos] = React.useState([
-    { text: "Learn about React",
-    isCompleted: false
-   },
-    { text: "Meet friend for lunch",
-    isCompleted: false
-   },
-    { text: "Build really cool todo app",
-    isCompleted: false
-   }
-  ]);
 
-  const addTodo = text => {
-    const newTodos = [...todos, { text }];
-    setTodos(newTodos);
-  };
-  const completeTodo = index => {
-    const newTodos = [...todos];
-    newTodos[index].isCompleted = true;
-    setTodos(newTodos);
-  };
+
+function App() {
+  const [todos, setTodos] = React.useState(
+    ['OK',"WTF"]
+  );
+
+  // const addTodo = text => {
+  //   const newTodos = [...todos, { text }];
+  //   setTodos(newTodos);
+  // };
+  // const completeTodo = index => {
+  //   const newTodos = [...todos];
+  //   newTodos[index].isCompleted = true;
+  //   setTodos(newTodos);
+  // };
   
-  const removeTodo = index => {
-    const newTodos = [...todos];
-    newTodos.splice(index, 1);
-    setTodos(newTodos);
-  };
+  // const removeTodo = index => {
+  //   const newTodos = [...todos];
+  //   newTodos.splice(index, 1);
+  //   setTodos(newTodos);
+  // };
+  const getToDo = async() => {
+    const res = await fetch('http://127.0.0.1:8000/')
+    const data = await res.json()
+    console.log(data)
+    setTodos(data)
+  }
+  React.useEffect(()=>{
+    getToDo()
+  }, [])
 
   return (
     <div className="app">
       <div className="todo-list">
-        {todos.map((todo, index) => (
-          <Todo
-            key={index}
-            index={index}
-            todo={todo}
-            completeTodo={completeTodo}
-            removeTodo={removeTodo}
-          />
+        {todos.map(todo => (
+          <div key={todo.id}>
+          <p>{todo.content}</p>  
+          </div>
         ))}
-        <TodoForm addTodo={addTodo} />
+        {/* <TodoForm addTodo={addTodo} /> */}
       </div>
     </div>
   );
