@@ -3,28 +3,41 @@ import './App.css';
 import React from 'react';
 
 
-function Todo({ todo, index, completeTodo, removeTodo }) {
+function Todo({ todo}) {
+  const removeToDo = async (todo) => {
+    const res = await fetch('http://127.0.0.1:8000/delete/', {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "id": todo
+      })
+    })
+    const data = await res.json()
+    console.log(data)
+  }
+
+
   return (
     <div
       className="todo"
-      style={{ textDecoration: todo.isCompleted ? "line-through" : "" }}
     >
-      {todo.text}
+      {todo.content}
       <div>
-        <button onClick={() => completeTodo(index)}>Complete</button>
-        <button onClick={() => removeTodo(index)}>x</button>
+        <button onClick={() => removeToDo(todo.id)}>x</button>
       </div>
     </div>
   );
 }
 
-function TodoForm({ addTodo }) {
+function TodoForm({ addToDo }) {
   const [value, setValue] = React.useState();
 
   const handleSubmit = e => {
     e.preventDefault();
     if (!value) return;
-    addTodo(value);
+    addToDo(value);
     setValue("");
   };
 
@@ -44,43 +57,47 @@ function TodoForm({ addTodo }) {
 
 function App() {
   const [todos, setTodos] = React.useState(
-    ['OK',"WTF"]
+    []
   );
 
-  // const addTodo = text => {
-  //   const newTodos = [...todos, { text }];
-  //   setTodos(newTodos);
-  // };
-  // const completeTodo = index => {
-  //   const newTodos = [...todos];
-  //   newTodos[index].isCompleted = true;
-  //   setTodos(newTodos);
-  // };
+
   
-  // const removeTodo = index => {
-  //   const newTodos = [...todos];
-  //   newTodos.splice(index, 1);
-  //   setTodos(newTodos);
-  // };
-  const getToDo = async() => {
+
+  const addToDo = async (value) => {
+    const res = await fetch('http://127.0.0.1:8000/add/', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "content": value
+      })
+    })
+    const data = await res.json()
+    console.log(data)
+  }
+
+  const getToDo = async () => {
     const res = await fetch('http://127.0.0.1:8000/')
     const data = await res.json()
     console.log(data)
     setTodos(data)
   }
-  React.useEffect(()=>{
+  React.useEffect(() => {
     getToDo()
   }, [])
 
   return (
     <div className="app">
       <div className="todo-list">
-        {todos.map(todo => (
-          <div key={todo.id}>
-          <p>{todo.content}</p>  
-          </div>
+        {todos.map((todo,index) => (
+          <Todo
+          key={index}
+          index={index}
+          todo={todo}
+        />
         ))}
-        {/* <TodoForm addTodo={addTodo} /> */}
+        <TodoForm addToDo={addToDo} />
       </div>
     </div>
   );
