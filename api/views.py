@@ -12,6 +12,7 @@ def getToDo(request):
 
 @api_view(["POST"])
 def postToDo(request):
+    print(request.data)
     item = ToDo()
     serializer = ToDoSerializer(item, data=request.data)
     if serializer.is_valid():
